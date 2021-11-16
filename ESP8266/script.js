@@ -104,9 +104,11 @@ const navBarSlide = () => {
             if (Math.abs(prog) > 96) {
                 dnone(navBar);
                 state.navbar = 0;
+                updateAllHeights();
             } else if (Math.abs(prog) < 5) {
                 dflex(navBar);
                 state.navbar = 1;
+                updateAllHeights();
             } else {
                 dflex(navBar);
                 state.navbar = dir;
@@ -262,6 +264,7 @@ const updateAllHeights = () => {
     setHeight(dc('gamepad'), contentHeight);
     setHeight(dc('status-page'), contentHeight);
     setHeight(dc('setup'), contentHeight);
+    setHeight(dc('reset-page'), contentHeight);
 }
 
 dae(window, 'resize', updateAllHeights);

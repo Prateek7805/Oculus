@@ -38,7 +38,7 @@ body{
 .container {  
 	font-family: Calibri, 'Gill Sans', 'Gill Sans MT', 'Trebuchet MS', sans-serif;
 	width: 100vw;
-	height: 100vh;
+	min-height: 100vh;
 }
 
 .row {
@@ -152,7 +152,7 @@ body{
 	display: none;
 	flex-direction: column;
 	background-color: var(--navbar);
-	width: 20vw;
+	width: 25vw;
 	height: calc(100vh - 30px);
 	top: 0;
 	left: 0;
@@ -205,8 +205,8 @@ body{
 /* button */
 
 .g-btn {
-	width: 8vw;
-    height: 8vw;
+	width: 16vh;
+    height: 16vh;
 	margin: 10px;
 	border: none;
 	background-color: var(--g-btn);
@@ -218,6 +218,13 @@ body{
 .g-btn:active{
     transform: scale(0.96);
 }
+.g-btn svg{
+    width: 8vh;
+    height: 8vh;
+    stroke: var(--gamepad-button);
+    stroke-width: 2;
+}
+
 .forward {
 	border-radius: 50% 50% 10% 10%;
 }
@@ -238,12 +245,6 @@ body{
 	border-radius: 50%;
 }
 
-.g-btn svg{
-    width: 3em;
-    height: 3em;
-    stroke: var(--gamepad-button);
-    stroke-width: 2;
-}
 
 /* content */
 
@@ -358,10 +359,10 @@ body{
    /* reset page */
    .reset-page{
 	   display: none;
-	   justify-content: space-evenly;
+	   justify-content: space-around;
 	   padding: 2em;
    }
-@media only screen and (max-width: 767px) {
+@media only screen and (max-width: 600px) {
 	/* navbar */
 	.nav-bar {
 		width: 50vw;
@@ -375,13 +376,18 @@ body{
 	}
 	/* gamepad */
 	.g-btn{
-		width: 20vw;
-		height: 20vw;
+		width: 18vw;
+		height: 18vw;
 		transition: 0s box-shadow;
 	}
 	.g-btn:hover{
 		box-shadow: 0 0;
 	}
+	.g-btn svg{
+		width: 8vw;
+		height: 8vw;
+	}
+	
 	.speed{
 		width: 90%;
 	}

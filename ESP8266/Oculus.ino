@@ -282,7 +282,7 @@ void socketHandle(uint8_t num, WStype_t type, uint8_t * payload, size_t length){
       case 's':{
                 switch(payload[1]){
                   case 'h':{
-                    state.headLight = payload[2] - '0'; //here the headLight is on
+                    state.headLight = payload[2] - '0'; //1- on 0- off
                     break;
                   }
                   case 'b':{
