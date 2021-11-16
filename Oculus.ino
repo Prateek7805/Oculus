@@ -65,7 +65,6 @@ struct stateFields {
   bool headLight; //1 -> ON
   uint16_t speed; //0 - 100
   uint16_t brightness;//0 -100
-  bool commType;//1 -> Web Socket 0 -> Fetch
   bool darkMode;//1 -> DARK 0-> LIGHT
 } state;
 
@@ -78,7 +77,7 @@ struct credentials {
 
 void resetState(){
    File file = SPIFFS.open("/state.txt", "w");
-   file.print("0\n1023\n1023\n1\n1\n");
+   file.print("0\n1023\n1023\n1\n");
    file.close();
 }
 void resetCreds(){
@@ -95,7 +94,6 @@ void loadState(){
   state.headLight = (bool)file.readStringUntil('\n').toInt();
   state.speed = (uint16_t)file.readStringUntil('\n').toInt();
   state.brightness = (uint16_t)file.readStringUntil('\n').toInt();
-  state.commType = (bool)file.readStringUntil('\n').toInt();
   state.darkMode = (bool)file.readStringUntil('\n').toInt();
   file.close();
 }
@@ -118,7 +116,6 @@ String stateJSON(){
   String JSON = "{\"headLight\" : " + (String)state.headLight + ",";
   JSON += "\"speed\" : " + (String)state.speed + ",";
   JSON += "\"brightness\" : " + (String)state.brightness + ",";
-  JSON += "\"commType\" : " + (String)state.commType + ",";
   JSON += "\"darkMode\" : " + (String)state.darkMode + ",";
   JSON += "\"voltage\" : " +(String)ESP.getVcc() + ",";
   JSON += "\"STA_SSID\" : \"" + creds.STA_SSID + "\",";
@@ -130,7 +127,7 @@ String stateJSON(){
 
 void updateState(){
   File file = SPIFFS.open("/state.txt", "w");
-  file.printf("%d\n%d\n%d\n%d\n%d\n", state.headLight,state.speed, state.brightness,state.commType,state.darkMode);
+  file.printf("%d\n%d\n%d\n%d\n", state.headLight,state.speed, state.brightness,state.darkMode);
   file.close();
 }
 void updateCreds(){
@@ -149,7 +146,8 @@ void connectWiFi(){
   uint8_t wiFiType = (creds.ESP_PASS != "")? 0x01 : 0;
   wiFiType |= (creds.ESP_PASS != "")? 0x02 : 0;
   wiFiType |= (creds.STA_SSID != "")? 0x04 : 0;
-  wiFiType |= (creds.STA_SSID != "")? 0x08 : 0;
+  wiFiType |= (creds.STA_PASS != "")? 0x08 : 0;
+  
   uint8_t tries = 0;
   switch(wiFiType){
     case 0x0F : {
@@ -161,9 +159,7 @@ void connectWiFi(){
       
       while (WiFi.status() != WL_CONNECTED)
       {
-        delay(100);
-        Serial.println(tries);
-        
+        delay(100);      
         if(tries++ == 100){
           creds.STA_SSID = "";
           creds.STA_PASS = "";
@@ -208,17 +204,7 @@ void setup() {
   Serial.begin(115200);
 
   connectWiFi();
-  
-  server.on("/c",HTTP_GET,[](){
-    byte DIR_index = server.arg(0).toInt();
-    byte DIR_state = server.arg(1).toInt();
-    dir[DIR_index] = DIR_state;
-    Serial.printf("%s %s\n",server.arg(0), server.arg(1));
-    //Serial.print(dir[0]);Serial.print(dir[1]);Serial.print(dir[2]);Serial.println(dir[3]);
-    updateCar();
-    returnOK();
-  });
-  
+  loadCreds();
   server.on("/off",HTTP_GET,[](){
     for(uint8_t i=0; i<4; i++) dir[i] = 0;
     updateCar();

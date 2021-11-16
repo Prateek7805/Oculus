@@ -1,13 +1,11 @@
 const char _script[] PROGMEM = R"=====(
 const DESKTOP_WIDTH = 768;
-const commType = 'Socket'
 const HOST_URL = window.location.origin;
 var Socket;
 var state = {
     headLight: 1,
     speed: 100,
     brightness: 100,
-    commType: 0,
     darkMode: 1,
     navbar: 0
 };
@@ -228,11 +226,7 @@ const updateState = (data) => {
         ...state,
         ...data
     };
-    if (state.commType == 1) {
-        connect();
-    } else {
-        d('connection').innerHTML = `Online <div class='dot dot-online'></div>`
-    }
+    connect(); 
     headLight();
     brightness();
     speed();
@@ -246,7 +240,7 @@ const resetState = () =>{
 dae(d('reset-state'), 'click', resetState);
 
 const resetCreds=()=>{
-    fetch(`${HOST_URL}/resetcreds`).then(res => res.text())
+    fetch(`${HOST_URL}/resetcreds`).then(res => res.text());
 }
 dae(d('reset-creds'), 'click', resetCreds);
 
@@ -332,7 +326,7 @@ dae(document, 'DOMContentLoaded', () => {
 
     dae(dc('right'), 'touchend', rightF);
 
-    dae(dc('stop'), 'click', stop);
+    dae(dc('stop'), 'click', ()=>{stop(); fetch(`${HOST_URL}/off`);});
 
     dae(d('status-data'), 'click', showStatus);
 
@@ -350,31 +344,25 @@ dae(document, 'DOMContentLoaded', () => {
             updateState(data);
             //Event Listeners
 
-            dae(d('headlight'), 'click', () => { state.headLight = 1 - state.headLight; headLight(); sendCommand('st', 'h', state.headLight) });
+            dae(d('headlight'), 'click', () => { state.headLight = 1 - state.headLight; headLight(); sendCommand('s', 'h', state.headLight) });
 
             dae(d('brightness'), 'change', (e) => {
                 state.brightness = e.target.value;
-                sendCommand('st', 'b', e.target.value);
+                sendCommand('s', 'b', e.target.value);
             });
 
             dae(dc('speed'), 'change', (e) => {
-                sendCommand('st', 's', e.target.value);
+                sendCommand('s', 's', e.target.value);
             });
-            dae(d('restart'), 'click', () => sendCommand('st', 'r', 0));
-            dae(d('deepSleep'), 'click', () => sendCommand('st', 'd', 0));
+            dae(d('restart'), 'click', () => sendCommand('s', 'r', 0));
+            dae(d('deepSleep'), 'click', () => sendCommand('s', 'd', 0));
 
         }).catch(error => er(error));
 
 });
 
 const sendCommand = (uri, q1, q2) => {
-    if (state.commType == 1) {
-        _send(uri[0] + q1, q2);
-    } else {
-        fetch(`${HOST_URL}/${uri}?q1=${q1}&q2=${q2}`).then(response => response.text()).then((data) => {
-            er(data);
-        });
-    }
+    _send(uri[0] + q1, q2);
 }
 
 const forwardO = () => sendCommand('c', 0, 1);
@@ -387,5 +375,5 @@ const reverseF = () => sendCommand('c', 1, 0);
 const leftF = () => sendCommand('c', 2, 0);
 const rightF = () => sendCommand('c', 3, 0);
 
-const stop = () => sendCommand('off', 's', 0);
+const stop = () => sendCommand('o', 's', 0);
 )=====";
