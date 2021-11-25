@@ -23,7 +23,7 @@ I have updated the socketCar design and added a pear of headlights which double 
 ### [ Working - part 2](https://www.instagram.com/p/CWd5ZtoFdUe/) ###
   
 ### Pinout ###
-<img src="https://raw.githubusercontent.com/Prateek7805/socketCar4WD1.1/main/pinout.JPG" width='250' height='auto'/>
+<img src="https://raw.githubusercontent.com/Prateek7805/Oculus/main/pinout.JPG" width='250' height='auto'/>
 
 
 ### Features ###
