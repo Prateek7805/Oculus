@@ -1,5 +1,5 @@
 const char _styles[] PROGMEM = R"=====(
-:root {
+.darkMode {
 	--background: #393E46;
 	--title: #EEEEEE;
 	--header: #222831;
@@ -8,8 +8,10 @@ const char _styles[] PROGMEM = R"=====(
 	--navbar: #222831;
 	--nav-tile: #EEEEEE;
 	--nav-tile-hover: #393E46;
+	--nav-border: #393E46;
 	--gamepad-button: #7BC74D;
 	--headLight-glow: #0ff0ff;
+	--slider-text : #EEEEEE;
 	--text: #EEEEEE;
 	--dot-online: #81B214;
 	--dot-offline: #FF2626;
@@ -20,7 +22,29 @@ const char _styles[] PROGMEM = R"=====(
 	--fontSizeLarge : 1.5em;
 	--fontSizeSmall : 1.2em;
 }
-
+.lightMode{
+	--background: #F3F0D7;
+	--title: #FBD148;
+	--header: #3F3351;
+	--g-btn: #3F3351;
+    --g-btn-hover: #0ff0ff;
+	--navbar: #F6EABE;
+	--nav-tile: #3F3351;
+	--nav-tile-hover: #E2C275;
+	--nav-border: #E2C275;
+	--gamepad-button: #FBD148;
+	--headLight-glow: #0ff0ff;
+	--slider-text : #3F3351;
+	--text: #FBD148;
+	--dot-online: #81B214;
+	--dot-offline: #FF2626;
+	--dot-reconn: #FFCC29;
+	--card: #3F3351;
+	--card-border: #F3F0D7;
+	--card-btn: #1f1233;
+	--fontSizeLarge : 1.5em;
+	--fontSizeSmall : 1.2em;
+}
 * {
 	box-sizing: border-box;
 	padding: 0;
@@ -158,6 +182,7 @@ body{
 	top: 0;
 	left: 0;
 	transform: translateX(-100%);
+	border : 1px solid var(--nav-border);
 }
 
 
@@ -295,7 +320,9 @@ body{
     background:var(--gamepad-button);;
     cursor: pointer;
   }
-  
+  .slider-text{
+	  color: var(--slider-text);
+  }
   .speed{
 	width: 50%;
 	margin: 5px;
@@ -331,7 +358,7 @@ body{
 	  background-color: var(--card);
 	  padding: 1em;
 	 
-	  border-radius: 4px;
+	  border-radius: 6px;
 	  font-size: var(--fontSizeLarge);	  
 	  border: 2px solid var(--card-border);
 	  box-shadow: 0 0 20px 3px var(--card-border);

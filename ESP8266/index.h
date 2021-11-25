@@ -7,7 +7,7 @@ const char _index[] PROGMEM = R"=====(
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <title>Document</title>
+    <title>socket Car</title>
 </head>
 
 <body>
@@ -44,7 +44,7 @@ const char _index[] PROGMEM = R"=====(
                             <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                         </svg></p>
-                    <input class="slider my w-100" type="range" id="brightness" max=1023 min=0 />
+                    <input class="slider my w-100" type="range" id="brightness" max="255" min=0 />
                 </div>
                 <div class="nav-tiles" id="connection">
                     Offline <div class="dot dot-offline"></div>
@@ -63,6 +63,9 @@ const char _index[] PROGMEM = R"=====(
                 </div>
                 <div class="nav-tiles push-down" id="reset-data">
                     Reset Data
+                </div>
+                <div class="nav-tiles push-down" id="darkmode">
+                    Dark Mode
                 </div>
             </div>
 
@@ -97,8 +100,8 @@ const char _index[] PROGMEM = R"=====(
                 </div>
 
                 <div class="row-center my">
-                    <input type="range" class="slider speed" max="1023" min="0" value="0">
-                    <p id="speed-val" class="text">0</p>
+                    <input type="range" class="slider speed" max="255" min="0" value="0">
+                    <p id="speed-val" class="slider-text">0</p>
                 </div>
             </div>
             <div class="status-page d-n">

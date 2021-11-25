@@ -1,14 +1,11 @@
 const char _script[] PROGMEM = R"=====(
 const DESKTOP_WIDTH = 768;
-const commType = 'Socket'
 const HOST_URL = window.location.origin;
 var Socket;
 var state = {
     headLight: 1,
     speed: 100,
     brightness: 100,
-    commType: 0,
-    darkMode: 1,
     navbar: 0
 };
 
@@ -35,15 +32,24 @@ const er = (m) => {
 const _send = (head, data) => {
     Socket.send(head + data);
 }
+const getTheme = () => {
+    return localStorage.getItem('theme');
+}
+const setTheme = (themeName) => {
+    localStorage.setItem('theme', themeName);
+    document.documentElement.className = themeName;
+    d('darkmode').innerHTML = themeName == 'darkMode' ? 'Light Mode' : 'Dark Mode';
+}
+const toggleTheme = () => setTheme(getTheme() != 'darkMode' ? 'darkMode' : 'lightMode');
 
 const toNum = (st) => {
     return parseFloat(st.substring(0, st.lastIndexOf('px')))
 }
 
 const validateCred = (SSID, PASS) => {
-    if (!SSID.match(/^[A-z0-9_]{1,32}$/)) {
+    if (!SSID.match(/^[^!#;+\]\/"\t][^+\]"\t]{0,31}$/)) {
         return false;
-    } if ((PASS == "") || !PASS.match(/^[^\n ]{8,63}$/)) {
+    } if ((PASS == "") || !PASS.match(/^[ -~]{8,63}$/)) {
         return false;
     }
     return true;
@@ -178,6 +184,7 @@ dae(dc('gamepad'), 'click', () => {
     closeNavBar();
     showGamepad();
 });
+
 dae(dc('status-page'), 'click', () => {
     closeNavBar();
     showGamepad();
@@ -187,6 +194,7 @@ dae(d('setup'), 'click', () => {
     closeNavBar();
     showSetup();
 });
+
 dae(d('reset-data'), 'click', () => {
     closeNavBar();
     showReset();
@@ -197,7 +205,13 @@ dae(d('SUBMIT_STA'), 'click', () => {
     var SSID = d('SSID_STA').value;
     var PASS = d('PASS_STA').value;
     if (validateCred(SSID, PASS)) {
-        fetch(`${HOST_URL}/cred?q1=STA&q2=${SSID}&q3=${PASS}`).then(response => response.text()).then((data) => {
+        fetch(`${HOST_URL}/cred`, {
+            method: "POST",
+            headers: {
+                'Content-type': 'application/x-www-form-urlencoded'
+            },
+            body: `type=STA&ssid=${SSID}&pass=${PASS}`
+        }).then(response => response.text()).then((data) => {
             d('SSID_STA').value = "";
             d('PASS_STA').value = "";
         });
@@ -212,7 +226,13 @@ dae(d('SUBMIT_AP'), 'click', () => {
     var SSID = d('SSID_AP').value;
     var PASS = d('PASS_AP').value;
     if (validateCred(SSID, PASS)) {
-        fetch(`${HOST_URL}/cred?q1=AP&q2=${SSID}&q3=${PASS}`).then(response => response.text()).then((data) => {
+        fetch(`${HOST_URL}/cred`, {
+            method: "POST",
+            headers: {
+                'Content-type': 'application/x-www-form-urlencoded'
+            },
+            body: `type=AP&ssid=${SSID}&pass=${PASS}`
+        }).then(response => response.text()).then((data) => {
             d('SSID_AP').value = "";
             d('PASS_AP').value = "";
         });
@@ -228,33 +248,30 @@ const updateState = (data) => {
         ...state,
         ...data
     };
-    if (state.commType == 1) {
-        connect();
-    } else {
-        d('connection').innerHTML = `Online <div class='dot dot-online'></div>`
-    }
+    connect();
     headLight();
     brightness();
     speed();
 }
 
-const resetState = () =>{
-    fetch(`${HOST_URL}/resetstate`).then(res => res.text()).then(()=>{
+const resetState = () => {
+    fetch(`${HOST_URL}/resetstate`).then(res => res.text()).then(() => {
         fetch(`${HOST_URL}/state`).then(res => res.json()).then(data => updateState(data));
     });
 }
 dae(d('reset-state'), 'click', resetState);
 
-const resetCreds=()=>{
-    fetch(`${HOST_URL}/resetcreds`).then(res => res.text())
+const resetCreds = () => {
+    fetch(`${HOST_URL}/resetcreds`).then(res => res.text());
 }
 dae(d('reset-creds'), 'click', resetCreds);
 
-const resetAll =()=>{
+const resetAll = () => {
     resetState();
     resetCreds();
 }
 dae(d('reset-all'), 'click', resetAll);
+dae(d('darkmode'), 'click', toggleTheme);
 
 const updateAllHeights = () => {
     const setHeight = (o, h) => { o.style.height = h };
@@ -298,8 +315,6 @@ dae(document, 'DOMContentLoaded', () => {
     // nav height
     updateAllHeights();
 
-    
-
     dae(dc('forward'), 'mousedown', forwardO);
 
     dae(dc('backward'), 'mousedown', reverseO);
@@ -332,7 +347,7 @@ dae(document, 'DOMContentLoaded', () => {
 
     dae(dc('right'), 'touchend', rightF);
 
-    dae(dc('stop'), 'click', stop);
+    dae(dc('stop'), 'click', () => { stop(); fetch(`${HOST_URL}/off`); });
 
     dae(d('status-data'), 'click', showStatus);
 
@@ -350,31 +365,25 @@ dae(document, 'DOMContentLoaded', () => {
             updateState(data);
             //Event Listeners
 
-            dae(d('headlight'), 'click', () => { state.headLight = 1 - state.headLight; headLight(); sendCommand('st', 'h', state.headLight) });
+            dae(d('headlight'), 'click', () => { state.headLight = 1 - state.headLight; headLight(); sendCommand('s', 'h', state.headLight) });
 
             dae(d('brightness'), 'change', (e) => {
                 state.brightness = e.target.value;
-                sendCommand('st', 'b', e.target.value);
+                sendCommand('s', 'b', e.target.value);
             });
 
             dae(dc('speed'), 'change', (e) => {
-                sendCommand('st', 's', e.target.value);
+                sendCommand('s', 's', e.target.value);
             });
-            dae(d('restart'), 'click', () => sendCommand('st', 'r', 0));
-            dae(d('deepSleep'), 'click', () => sendCommand('st', 'd', 0));
+            dae(d('restart'), 'click', () => sendCommand('s', 'r', 0));
+            dae(d('deepSleep'), 'click', () => sendCommand('s', 'd', 0));
 
         }).catch(error => er(error));
 
 });
 
 const sendCommand = (uri, q1, q2) => {
-    if (state.commType == 1) {
-        _send(uri[0] + q1, q2);
-    } else {
-        fetch(`${HOST_URL}/${uri}?q1=${q1}&q2=${q2}`).then(response => response.text()).then((data) => {
-            er(data);
-        });
-    }
+    _send(uri[0] + q1, q2);
 }
 
 const forwardO = () => sendCommand('c', 0, 1);
@@ -387,5 +396,10 @@ const reverseF = () => sendCommand('c', 1, 0);
 const leftF = () => sendCommand('c', 2, 0);
 const rightF = () => sendCommand('c', 3, 0);
 
-const stop = () => sendCommand('off', 's', 0);
+const stop = () => sendCommand('o', 's', 0);
+
+(function () {
+    toggleTheme();
+    toggleTheme();
+})();
 )=====";
