@@ -1,10 +1,15 @@
 const DESKTOP_WIDTH = 768;
 const HOST_URL = window.location.origin;
+const SPEED_MAX = 255;
+const SPEED_MIN = 0;
+const BRIGHT_MAX = 255;
+const BRIGHT_MIN = 0;
+
 var Socket;
 var state = {
-    headLight: 1,
-    speed: 100,
-    brightness: 100,
+    headLight: 0,
+    speed: 0,
+    brightness: 0,
     navbar: 0
 };
 
@@ -286,6 +291,12 @@ const updateAllHeights = () => {
 
 dae(window, 'resize', updateAllHeights);
 
+const headlightToggle = () => {
+    state.headLight = 1 - state.headLight;
+    headLight();
+    sendCommand('s', 'h', state.headLight);
+}
+
 const headLight = () => {
     var icon = d("headLight-icon");
     er(state.headLight);
@@ -298,14 +309,24 @@ const headLight = () => {
 
 const brightness = () => {
     d('brightness').value = state.brightness;
+    state.brightness = parseInt(d('brightness').value);
     var color = getComputedStyle(document.querySelector(':root')).getPropertyValue('--headLight-glow');
     var icon = d("headLight-icon");
     icon.style.filter = `drop-shadow(0 0 ${4 * state.brightness / 100}px ${color})`;
 }
 
+const changeBrightness = (val) => {
+    sendCommand('s', 'b', val);
+}
+
 const speed = () => {
     dc('speed').value = state.speed;
+    state.speed = parseInt(dc('speed').value);
     d('speed-val').innerHTML = state.speed;
+}
+
+const changeSpeed = (val) => {
+    sendCommand('s', 's', val);
 }
 
 
@@ -329,6 +350,16 @@ dae(document, 'DOMContentLoaded', () => {
     dae(dc('left'), 'mouseup', leftF);
 
     dae(dc('right'), 'mouseup', rightF);
+
+
+    dae(document, 'keydown', keyControl);
+
+    dae(document, 'keyup', keyControl);
+
+    dae(document, 'keypress', keyPressControl);
+
+    dae(dc('speed'), 'keydown', (e) => { e.preventDefault(); });
+
 
     dae(dc('forward'), 'touchstart', forwardO);
 
@@ -364,15 +395,14 @@ dae(document, 'DOMContentLoaded', () => {
             updateState(data);
             //Event Listeners
 
-            dae(d('headlight'), 'click', () => { state.headLight = 1 - state.headLight; headLight(); sendCommand('s', 'h', state.headLight) });
+            dae(d('headlight'), 'click', headlightToggle);
 
             dae(d('brightness'), 'change', (e) => {
-                state.brightness = e.target.value;
-                sendCommand('s', 'b', e.target.value);
+                changeBrightness(e.target.value);
             });
 
             dae(dc('speed'), 'change', (e) => {
-                sendCommand('s', 's', e.target.value);
+                changeSpeed(e.target.value);
             });
             dae(d('restart'), 'click', () => sendCommand('s', 'r', 0));
             dae(d('deepSleep'), 'click', () => sendCommand('s', 'd', 0));
@@ -396,6 +426,95 @@ const leftF = () => sendCommand('c', 2, 0);
 const rightF = () => sendCommand('c', 3, 0);
 
 const stop = () => sendCommand('o', 's', 0);
+
+
+
+
+
+//keyboard functions
+
+const keySpeed = (type) => {
+    switch(type){
+        case 'plus':
+            if(state.speed < SPEED_MAX){
+                state.speed += 10;
+                speed();
+                changeSpeed(state.speed);
+            }
+            break;
+        case 'minus':
+            if(state.speed > SPEED_MIN){
+                state.speed -= 10;
+                speed();
+                changeSpeed(state.speed);
+            }
+            break;
+    }
+}
+const keyBrightness = (type) => {
+    switch (type) {
+        case 'Press':
+            headlightToggle();
+            break;
+        case 'plus':
+            if (state.brightness < BRIGHT_MAX) {
+                state.brightness += 10;
+                brightness();
+                changeBrightness(state.brightness);
+            }
+            break;
+        case 'minus':
+            if (state.brightness > BRIGHT_MIN) {
+                state.brightness -= 10;
+                brightness();
+                changeBrightness(state.brightness);
+            }
+            break;
+    }
+}
+const keyControl = (e) => {
+    switch (e.code) {
+        case 'ArrowUp':
+            (e.type == 'keydown') ? forwardO() : forwardF();
+            break;
+        case 'ArrowDown':
+            (e.type == 'keydown') ? reverseO() : reverseF();
+            break;
+        case 'ArrowLeft':
+            (e.type == 'keydown') ? leftO() : leftF();
+            break;
+        case 'ArrowRight':
+            (e.type == 'keydown') ? rightO() : rightF();
+            break;
+        case 'Space':
+            if (e.type == 'keydown') { stop(); }
+            break;
+        case 'KeyH':
+            if (e.type == 'keydown') { keyBrightness('plus') };
+            break;
+        case 'KeyN':
+            if (e.type == 'keydown') { keyBrightness('minus') };
+            break;
+    }
+}
+
+const keyPressControl = (e) => {
+    switch (e.code) {
+        case 'Equal':
+        case 'NumpadAdd':
+            keySpeed('plus');
+            break;
+        case 'Minus':
+        case 'NumpadSubtract':
+            keySpeed('minus');
+            break;
+        case 'KeyB':
+            keyBrightness('Press');
+            break;
+    }
+}
+
+//IIFE
 
 (function () {
     toggleTheme();

@@ -7,6 +7,7 @@
 #define NOTIFY_INTERVAL 200
 #define NOTIFY_ENABLE 4
 #define NOTIFY_DISABLE 0
+#define SPEED_LOW 80
 
 #include <ESP8266WiFi.h>
 #include<ESP8266WebServer.h>
@@ -66,8 +67,8 @@ bool checkInFS(String path) {
 
 struct stateFields {
   bool headLight; //1 -> ON
-  uint16_t speed; //0 - 100
-  uint16_t brightness;//0 -100
+  uint8_t speed; //0 - 100
+  uint8_t brightness;//0 -100
 } state;
 
 struct credentials {
@@ -94,8 +95,8 @@ void loadState() {
   }
   File file = SPIFFS.open("/state.txt", "r");
   state.headLight = (bool)file.readStringUntil('\n').toInt();
-  state.speed = (uint16_t)file.readStringUntil('\n').toInt();
-  state.brightness = (uint16_t)file.readStringUntil('\n').toInt();
+  state.speed = (uint8_t)file.readStringUntil('\n').toInt();
+  state.brightness = (uint8_t)file.readStringUntil('\n').toInt();
   file.close();
 }
 
@@ -318,12 +319,12 @@ void socketHandle(uint8_t num, WStype_t type, uint8_t * payload, size_t length) 
                     break;
                   }
                 case 'b': {
-                    state.brightness = (uint16_t) strtol((const char *)&payload[2], NULL, 10);
+                    state.brightness = (uint8_t) strtol((const char *)&payload[2], NULL, 10);
                     headLightUpdate();
                     break;
                   }
                 case 's': {
-                    state.speed = (uint16_t) strtol((const char *)&payload[2], NULL, 10);
+                    state.speed = (uint8_t) strtol((const char *)&payload[2], NULL, 10);
                     break;
                   }
                 case 'r': {
@@ -351,13 +352,14 @@ void socketHandle(uint8_t num, WStype_t type, uint8_t * payload, size_t length) 
 
 void updateCar() {
   uint8_t DIRECTION = 0;
+  uint8_t scaledSpeed = map(state.speed, 0, 255, 50, 255);
   DIRECTION = (dir[0] ? FORWARD : 0);
   DIRECTION |= (dir[1] ? REVERSE : 0);
   DIRECTION |= (dir[2] ? LEFT : 0);
   DIRECTION |= (dir[3] ? RIGHT : 0);
 
   for (uint8_t i = 0; i < 4; i++) {
-    analogWrite(pins[i], ((DIRECTION >> i) & 0x01) ? (uint16_t)state.speed : 0 );
+    analogWrite(pins[i], ((DIRECTION >> i) & 0x01) ? scaledSpeed : 0 );
   }
 }
 
