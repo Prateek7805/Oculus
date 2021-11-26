@@ -25,11 +25,25 @@ I have updated the socketCar design and added a pear of headlights which double 
 ### Pinout ###
 <img src="https://raw.githubusercontent.com/Prateek7805/Oculus/main/pinout.JPG" width='250' height='auto'/>
 
+### keyboard contols ###
+| key                | command                 |
+|:------------------:|:-----------------------:|
+| Arrow UP           | Foraward                |
+| Arrow DOWN         | Reverse                 |
+| Arrow LEFT         | Left                    |
+| Arrow RIGHT        | Right                   |
+| Space              | Stop                    |
+| Plus or Num Plus   | Speed +                 |
+| Minus or Num Minus | Speed -                 |
+| B                  | headlights Toggle       |
+| H                  | headlights Brightness + |
+| N                  | headlights Brightness - |
 
 ### Features ###
 * sidebar - control panel
 * Single page web interface
 * multi-touch
+* keyboard contols 
 * real-time with WebSocket
 * deepsleep
 * Soft Restart
