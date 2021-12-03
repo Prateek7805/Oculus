@@ -45,7 +45,12 @@ I have updated the socketCar design and added a pear of headlights which double 
 * sidebar - control panel
 * Single page web interface
 * multi-touch
-* keyboard contols 
+* keyboard contols
+* User defined controls with reset default
+* Gamepad controls 
+* realtime gamepad controls check
+* Plug and play capabitity
+* Toggle between keyboard and gamepad
 * real-time with WebSocket
 * deepsleep
 * Soft Restart
