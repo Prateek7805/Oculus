@@ -44,7 +44,7 @@ const char _index[] PROGMEM = R"=====(
                             <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                         </svg></p>
-                    <input class="slider my w-100" type="range" id="brightness" max="255" min=0  value="0"/>
+                    <input class="slider my w-100" type="range" id="brightness" max="255" min=0 value="0" />
                 </div>
                 <div class="nav-tiles" id="connection">
                     Offline <div class="dot dot-offline"></div>
@@ -55,8 +55,8 @@ const char _index[] PROGMEM = R"=====(
                 <div class="nav-tiles push-down" id="deepSleep">
                     Deep sleep
                 </div>
-                <div class="nav-tiles push-down" id="status-data">
-                    status
+                <div class="nav-tiles push-down" id="setting">
+                    settings
                 </div>
                 <div class="nav-tiles push-down" id="setup">
                     Credentials
@@ -105,7 +105,53 @@ const char _index[] PROGMEM = R"=====(
                 </div>
             </div>
 
-            <div class="status-page d-n">
+            <div class="settings d-n">
+                <div>
+                    <div class="card">
+                        <div class="dfe">
+                            <p class="text t-center">Keyboard Controls</p>
+                            <label class="switch">
+                                <input id="keyboardS" type="checkbox" onchange="handleController(event)">
+                                <span class="check"></span>
+                            </label>
+                        </div>
+                        <div class="dfe">
+                            <button class="card-btn" id="key-reset">Reset Defaults</button>
+                            <button class="card-btn" onclick="renderKeys();">Cancel</button>
+                        </div>
+
+                        <table class='table my' id="keyboard-controls">
+
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <div class="card">
+                        <div class="dfe">
+                            <p class="text t-center">Gamepad Controls</p>
+                            <label class="switch">
+                                <input id="joystickS" type="checkbox" onchange="handleController(event)">
+                                <span class="check"></span>
+                            </label>
+                        </div>
+                        <table class="table my" id="joystick-controls">
+                            <tr class="table-head">
+                                <th>Control</th>
+                                <th>Channel</th>
+                            </tr>
+                            <tr class="table-body">
+                                <td>axis</td>
+                                <td>
+                                    <div class="progress">
+                                        <div>
+                                            <div></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <div class="setup">

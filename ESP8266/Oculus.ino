@@ -143,7 +143,7 @@ void updateCreds() {
 }
 
 bool validateCreds(String _ssid, String _pass) {
-  if (_ssid == "" || _ssid.length()<1 ||   _ssid.length()>32)
+  if (_ssid == "" || _ssid.length()<1 || _ssid.length()>32)
     return false;
   if (_pass == "" || _pass.length()<8 || _pass.length()>63)
     return false;

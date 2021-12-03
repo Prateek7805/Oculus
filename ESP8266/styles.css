@@ -1,3 +1,16 @@
+:root{
+	--fontSizeLarge : 1.5em;
+	--fontSizeSmall : 1.2em;
+	--tableHeaderFontL : 1.1em;
+	--tableBodyFontL : 0.9em;
+	--tableHeaderFontS : 0.9em;
+	--tableBodyFontS : 0.7em;
+	--dot-online: #81B214;
+	--dot-offline: #FF2626;
+	--dot-reconn: #FFCC29;
+	--progressOuter : #602080;
+	--progressInner: #7BC74D;
+}
 .darkMode {
 	--background: #393E46;
 	--title: #EEEEEE;
@@ -12,14 +25,10 @@
 	--headLight-glow: #0ff0ff;
 	--slider-text : #EEEEEE;
 	--text: #EEEEEE;
-	--dot-online: #81B214;
-	--dot-offline: #FF2626;
-	--dot-reconn: #FFCC29;
 	--card: #2B2B2B;
 	--card-border: #3f4650;
 	--card-btn: #602080;
-	--fontSizeLarge : 1.5em;
-	--fontSizeSmall : 1.2em;
+	
 }
 .lightMode{
 	--background: #F3F0D7;
@@ -35,14 +44,9 @@
 	--headLight-glow: #0ff0ff;
 	--slider-text : #3F3351;
 	--text: #FBD148;
-	--dot-online: #81B214;
-	--dot-offline: #FF2626;
-	--dot-reconn: #FFCC29;
 	--card: #3F3351;
 	--card-border: #F3F0D7;
 	--card-btn: #1f1233;
-	--fontSizeLarge : 1.5em;
-	--fontSizeSmall : 1.2em;
 }
 * {
 	box-sizing: border-box;
@@ -108,7 +112,6 @@ body{
 .w-50{
 	width: 50%;
 }
-
 .w-100{
 	width: 100%;
 }
@@ -142,6 +145,54 @@ body{
 }
 .dot-reconn{
 	background-color: var(--dot-reconn);
+}
+
+/* Table */
+
+.table-head{
+	color: var(--text);
+	font-size: var(--tableHeaderFontL);
+	padding:10px;
+}
+.table-body{
+	color:var(--text);
+	font-size: var(--tableBodyFontL);
+}
+.table-body >td, .table-head > th{
+	padding:10px;
+	text-align: center;
+}
+.table, .table-body >td, .table-head > th{
+	border: 1px solid var(--text);
+	border-collapse: collapse;
+}
+.table-text{
+	border: none;
+	width: 50%;
+	background-color: var(--card);
+	color: var(--text);
+}
+
+/*Progress*/
+
+.progress{
+    display: table;
+	width: 100%;
+}
+.progress > div{
+   display: table;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background-color: var(--progressOuter);
+}
+.progress > div > div{
+    display: table;
+    width: 0%;
+    height: 4px;
+    border-radius: 2px;
+    background-color: var(--progressInner);
+	padding: 1px;
 }
 /*header*/
 
@@ -184,7 +235,6 @@ body{
 	border : 1px solid var(--nav-border);
 }
 
-
 .nav-tiles {
 	display: flex;
 	justify-content: center;
@@ -193,6 +243,7 @@ body{
 	color: var(--nav-tile);
     font-size: var(--fontSizeLarge);
 }
+
 .nav-tiles svg{
 	width: 0.9em;
 	height: 0.9em;
@@ -269,8 +320,56 @@ body{
 .stop {
 	border-radius: 50%;
 }
+/*checkbox*/
 
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 70px;
+	height: 30px;
+  }
+  
+  .switch input {
+   display: none;
+  }
+  
+  .check {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	border-radius: 32px;
+	background-color: #2196F3;
+	transition: 0.4s;
+  }
+  
+  .check:before {
+	position: absolute;
+	content: "";
+	height: 24px;
+	width: 26px;
+	left: 4px;
+	bottom: 3px;
+	border-radius: 50%;
+	background-color: #FFF;
+	transition: .4s;
+  }
+  
+  input:checked + .check {
+	background-color: #ABDF61;
+  }
+  
+  input:focus + .check {
+	box-shadow: 0 0 10px #2196F3;
+  }
+  
+  input:checked + .check:before {
+	transform: translateX(36px);
+  }
 
+  
 /* content */
 
 .content {
@@ -330,25 +429,13 @@ body{
 	color: var(--text);
   }
 
-  /* Status Page */
-  .status-page{
-	  padding : 1.5em;
-	  flex-direction: column;
-	  justify-content: flex-start;
-	  color : var(--text);
-	  font-size: var(--fontSizeLarge);
-  }
-  .status-page > p{
-	  margin-top: 5px;
-	  text-align: center;
-  }
-  
-  /*setup page*/
+  /*setup page settings*/
 
-  .setup{
+  .setup, .settings{
 	  display: none;
 	  justify-content: space-around;
 	  padding: 2em;
+	  overflow-x: hidden;
   }
   /* card */
   .card{
@@ -389,6 +476,8 @@ body{
 	   justify-content: space-around;
 	   padding: 2em;
    }
+
+
 @media only screen and (max-width: 600px) {
 	/* navbar */
 	.nav-bar {
@@ -418,14 +507,7 @@ body{
 	.speed{
 		width: 90%;
 	}
-	.status-page{
-		font-size: var(--fontSizeSmall);
-		padding: 0.8em;
-	}
-	/* status page */
-	.status-page > p{
-		text-align: end;
-	}
+	
 	.nav-tiles {
 		font-size: var(--fontSizeSmall);
 	}
@@ -446,9 +528,10 @@ body{
 	  }
 	
 	  /* setup */
-	  .setup{
+	  .setup, .settings{
 		  flex-direction: column;
 		  justify-content: flex-start;
+		  
 	  }
 	  .card{
 		  font-size: 20px;

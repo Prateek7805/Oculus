@@ -10,15 +10,23 @@ var state = {
     headLight: 0,
     speed: 0,
     brightness: 0,
-    navbar: 0
+    navbar: 0,
+    joyStickConnected: false
 };
 
+var controllerState = {
+    keyboardS: false,
+    joystickS: false
+};
 //General Functions
 function d(i) {
     return document.getElementById(i);
 }
 function dae(o, e, f) {
     o.addEventListener(e, f);
+}
+function dar(o, e, f) {
+    o.removeEventListener(e, f);
 }
 function dc(c, i) {
     return document.getElementsByClassName(c)[i || 0];
@@ -32,19 +40,26 @@ function dflex(o) {
 const er = (m) => {
     console.log(m);
 }
-
+const disEn = (o, status) => {
+    o.disabled = status;
+}
 const _send = (head, data) => {
     Socket.send(head + data);
 }
-const getTheme = () => {
-    return localStorage.getItem('theme');
+function copy(aObject) {
+    if (!aObject) {
+        return aObject;
+    }
+
+    let v;
+    let bObject = Array.isArray(aObject) ? [] : {};
+    for (const k in aObject) {
+        v = aObject[k];
+        bObject[k] = (typeof v === "object") ? copy(v) : v;
+    }
+
+    return bObject;
 }
-const setTheme = (themeName) => {
-    localStorage.setItem('theme', themeName);
-    document.documentElement.className = themeName;
-    d('darkmode').innerHTML = themeName == 'darkMode' ? 'Light Mode' : 'Dark Mode';
-}
-const toggleTheme = () => setTheme(getTheme() != 'darkMode' ? 'darkMode' : 'lightMode');
 
 const toNum = (st) => {
     return parseFloat(st.substring(0, st.lastIndexOf('px')))
@@ -71,7 +86,6 @@ function animate({ timing, draw, duration }) {
         }
     });
 }
-
 // Custom
 
 const connect = () => {
@@ -133,49 +147,43 @@ const closeNavBar = () => {
     if (state.navbar) { navBarSlide(); }
 }
 
-const showStatus = () => {
-    var statusPage = dc('status-page');
-    var gamepad = dc('gamepad');
-    var setup = dc('setup');
-    fetch(`${HOST_URL}/state`).then(
-
-        (response) => {
-            if (response.ok) { return response.json() }
-            else {
-                throw new Error("please reset state");
-            }
-        }).then((data) => {
-            var statusData = ""
-            for (var key in data) {
-                statusData += `<p>${key} : ${data[key]}</p>`;
-            }
-            statusPage.innerHTML = statusData;
-            dflex(statusPage);
-            dnone(gamepad);
-            dnone(setup);
-        }).catch(error => er(error));
-}
 const showGamepad = () => {
-    var statusPage = dc('status-page');
+    var statusPage = dc('settings');
     var gamepad = dc('gamepad');
     var setup = dc('setup');
     var resetPage = dc('reset-page');
+    keyEvents(controllerState.keyboardS);
+    joyEvents(controllerState.joystickS);
     dnone(statusPage);
     dnone(setup);
     dnone(resetPage);
     dflex(gamepad);
 }
 
+const showSettings = () => {
+    var statusPage = dc('settings');
+    var gamepad = dc('gamepad');
+    var setup = dc('setup');
+    dnone(dc('gamepad'));
+    dnone(dc('setup'));
+    keyEvents(false);
+
+    dflex(dc('settings'));
+}
 
 const showSetup = () => {
+    keyEvents(false);
+
     dnone(dc('gamepad'));
-    dnone(dc('status-page'));
+    dnone(dc('settings'));
     dflex(dc('setup'));
 }
 
 const showReset = () => {
+    keyEvents(false);
+
     dnone(dc('gamepad'));
-    dnone(dc('status-page'));
+    dnone(dc('settings'));
     dflex(dc('reset-page'));
 }
 
@@ -189,10 +197,7 @@ dae(dc('gamepad'), 'click', () => {
     showGamepad();
 });
 
-dae(dc('status-page'), 'click', () => {
-    closeNavBar();
-    showGamepad();
-});
+
 
 dae(d('setup'), 'click', () => {
     closeNavBar();
@@ -204,6 +209,10 @@ dae(d('reset-data'), 'click', () => {
     showReset();
 });
 
+dae(d('setting'), 'click', () => {
+    closeNavBar();
+    showSettings();
+});
 
 dae(d('SUBMIT_STA'), 'click', () => {
     var SSID = d('SSID_STA').value;
@@ -275,7 +284,6 @@ const resetAll = () => {
     resetCreds();
 }
 dae(d('reset-all'), 'click', resetAll);
-dae(d('darkmode'), 'click', toggleTheme);
 
 const updateAllHeights = () => {
     const setHeight = (o, h) => { o.style.height = h };
@@ -284,7 +292,7 @@ const updateAllHeights = () => {
     var contentHeight = (toNum(containerCss.height) - toNum(headerCss.height)) + 'px';
     setHeight(dc('nav-bar'), contentHeight);
     setHeight(dc('gamepad'), contentHeight);
-    setHeight(dc('status-page'), contentHeight);
+    setHeight(dc('settings'), contentHeight);
     setHeight(dc('setup'), contentHeight);
     setHeight(dc('reset-page'), contentHeight);
 }
@@ -299,7 +307,6 @@ const headlightToggle = () => {
 
 const headLight = () => {
     var icon = d("headLight-icon");
-    er(state.headLight);
     if (state.headLight == 1) {
         icon.style.display = 'inline';
     } else {
@@ -328,7 +335,27 @@ const speed = () => {
 const changeSpeed = (val) => {
     sendCommand('s', 's', val);
 }
+dae(d('brightness'), 'input', (e) => {
+    state.brightness = e.target.value;
+    brightness();
+});
+dae(dc('speed'), 'input', (e) => {
+    state.speed = e.target.value;
+    speed();
+});
 
+
+const getTheme = () => {
+    return localStorage.getItem('theme');
+}
+const setTheme = (themeName) => {
+    localStorage.setItem('theme', themeName);
+    document.documentElement.className = themeName;
+    d('darkmode').innerHTML = themeName == 'darkMode' ? 'Light Mode' : 'Dark Mode';
+}
+const toggleTheme = () => setTheme(getTheme() != 'darkMode' ? 'darkMode' : 'lightMode');
+
+dae(d('darkmode'), 'click', toggleTheme);
 
 
 dae(document, 'DOMContentLoaded', () => {
@@ -352,12 +379,6 @@ dae(document, 'DOMContentLoaded', () => {
     dae(dc('right'), 'mouseup', rightF);
 
 
-    dae(document, 'keydown', keyControl);
-
-    dae(document, 'keyup', keyControl);
-
-    dae(document, 'keypress', keyPressControl);
-
     dae(dc('speed'), 'keydown', (e) => { e.preventDefault(); });
 
 
@@ -379,11 +400,22 @@ dae(document, 'DOMContentLoaded', () => {
 
     dae(dc('stop'), 'click', () => { stop(); fetch(`${HOST_URL}/off`); });
 
-    dae(d('status-data'), 'click', showStatus);
 
-    dae(dc('speed'), 'input', (e) => {
-        d('speed-val').innerHTML = e.target.value;
+    keyInit();
+    joyInit();
+    
+    dae(window, "gamepadconnected", () => {
+        er('gamepad connected');
+        state.joyStickConnected = true;
+        joyEvents(controllerState.joystickS);
+        createGVector();
     });
+    dae(window, "gamepaddisconnected", () => {
+        state.joyStickConnected = false;
+        joyEvents(controllerState.joystickS);
+        clearProgress();
+    });
+
 
     fetch(`${HOST_URL}/state`).then(
         (response) => {
@@ -427,23 +459,54 @@ const rightF = () => sendCommand('c', 3, 0);
 
 const stop = () => sendCommand('o', 's', 0);
 
-
-
-
-
+//table local storage
+//common fns
+const saveTable = (param, table) => {
+    localStorage.setItem(param, JSON.stringify(table));
+}
+const getTable = (param) => {
+    return JSON.parse(localStorage.getItem(param));
+}
+const loadTable = (data, name) => {
+    let cont = copy(data);
+    let table = getTable(name);
+    if (!table) {
+        saveTable(name, data);
+    } else {
+        for (var i = 0; i < cont.length; i++) {
+            cont[i].key = table[i].key;
+        }
+    }
+    return cont;
+}
+const handleController = (e) => {
+    let checked = e.target.checked;
+    for (var item in controllerState) {
+        controllerState[item] = false;
+        try {
+            d(item).checked = false;
+        } catch { }
+    }
+    d(e.target.id).checked = checked;
+    controllerState[e.target.id] = checked;
+    joyEvents(controllerState.joystickS);
+}
 //keyboard functions
+const kConDefault = [{ type: 'forward', command: 'forward', key: 'ArrowUp', KEYDOWN: forwardO, KEYUP: forwardF }, { type: 'reverse', command: 'reverse', key: 'ArrowDown', KEYDOWN: reverseO, KEYUP: reverseF }, { type: 'right', command: 'right', key: 'ArrowRight', KEYDOWN: rightO, KEYUP: rightF }, { type: 'left', command: 'left', key: 'ArrowLeft', KEYDOWN: leftO, KEYUP: leftF }, { type: 'stop', command: 'Stop', key: 'Space', KEYDOWN: stop }, { type: 'light', command: 'Headlight', key: 'KeyB', KEYDOWN: () => { keyBrightness('press'); } }, { type: 'brightnessp', command: 'Headlight Brightness +', key: 'KeyH', KEYDOWN: () => { keyBrightness('plus'); } }, { type: 'brightnessm', command: 'Headlight Brightness -', key: 'KeyN', KEYDOWN: () => { keyBrightness('minus'); } }, { type: 'speedp', command: 'Speed +', key: 'NumpadAdd', KEYDOWN: () => { keySpeed('plus'); } }, { type: 'speedm', command: 'Speed -', key: 'NumpadSubtract', KEYDOWN: () => { keySpeed('minus'); } }]
+var kCont;
+
 
 const keySpeed = (type) => {
-    switch(type){
+    switch (type) {
         case 'plus':
-            if(state.speed < SPEED_MAX){
+            if (state.speed < SPEED_MAX) {
                 state.speed += 10;
                 speed();
                 changeSpeed(state.speed);
             }
             break;
         case 'minus':
-            if(state.speed > SPEED_MIN){
+            if (state.speed > SPEED_MIN) {
                 state.speed -= 10;
                 speed();
                 changeSpeed(state.speed);
@@ -451,9 +514,10 @@ const keySpeed = (type) => {
             break;
     }
 }
+
 const keyBrightness = (type) => {
     switch (type) {
-        case 'Press':
+        case 'press':
             headlightToggle();
             break;
         case 'plus':
@@ -472,46 +536,321 @@ const keyBrightness = (type) => {
             break;
     }
 }
+
 const keyControl = (e) => {
-    switch (e.code) {
-        case 'ArrowUp':
-            (e.type == 'keydown') ? forwardO() : forwardF();
-            break;
-        case 'ArrowDown':
-            (e.type == 'keydown') ? reverseO() : reverseF();
-            break;
-        case 'ArrowLeft':
-            (e.type == 'keydown') ? leftO() : leftF();
-            break;
-        case 'ArrowRight':
-            (e.type == 'keydown') ? rightO() : rightF();
-            break;
-        case 'Space':
-            if (e.type == 'keydown') { stop(); }
-            break;
-        case 'KeyH':
-            if (e.type == 'keydown') { keyBrightness('plus') };
-            break;
-        case 'KeyN':
-            if (e.type == 'keydown') { keyBrightness('minus') };
-            break;
+    kCont.forEach((item) => {
+        if (item.key == e.code) {
+            item[e.type.toUpperCase()]();
+        }
+    });
+}
+
+const getkeyObj = (type) => {
+    var ele;
+    for (var i = 0; i < kCont.length; i++) {
+        if (kCont[i].type == type) {
+            ele = kCont[i];
+        }
+    }
+    return ele;
+}
+
+const keyEvents = (flag) => {
+    if (flag) {
+        dae(document, 'keydown', keyControl);
+        dae(document, 'keyup', keyControl);
+    } else {
+        dar(document, 'keydown', keyControl);
+        dar(document, 'keyup', keyControl);
     }
 }
 
-const keyPressControl = (e) => {
-    switch (e.code) {
-        case 'Equal':
-        case 'NumpadAdd':
-            keySpeed('plus');
-            break;
-        case 'Minus':
-        case 'NumpadSubtract':
-            keySpeed('minus');
-            break;
-        case 'KeyB':
-            keyBrightness('Press');
-            break;
+const renderKeys = () => {
+    const kc = d('keyboard-controls');
+    let table = `<tr class="table-head"><th>Control</th><th>Key</th></tr>`;
+    kCont.forEach((item) => {
+        table += `<tr class="table-body" id="${item.type}p"><td>${item.command}</td><td id="${item.type}" onclick="editKeyTable(this)">${item.key}</td></tr>`;
+    });
+    kc.innerHTML = table;
+}
+
+const editKeyTable = (self) => {
+    self.parentElement.innerHTML = `<td>${getkeyObj(self.id).command}</td><td id="${self.id}"><input type='text' class='table-text' onkeydown="setKey(event, this.parentElement.id)" placeholder="press a key"></td>`;
+    d(self.id).childNodes[0].focus();
+}
+function validateKeyPress(keycode) {
+    var valid = (keycode > 47 && keycode < 58) || // number keys
+        keycode == 32 || keycode == 13 ||// spacebar & return key(s) (if you want to allow carriage returns)
+        (keycode > 36 && keycode < 41) ||//arrow keys
+        (keycode > 64 && keycode < 91) || // letter keys
+        (keycode > 95 && keycode < 112) || // numpad keys
+        (keycode > 185 && keycode < 193) || // ;=,-./` (in order)
+        (keycode > 218 && keycode < 223); // [\]' (in order)
+    return valid;
+}
+function keyNotExists(key) {
+    let flag = true;
+    kCont.forEach((item) => {
+        if (item.key == key) { flag = false; }
+    });
+    return flag;
+}
+
+const setKey = (e, id) => { 
+    e = e || window.event;
+    e.preventDefault();
+    var charCode = (e.charCode) ? e.charCode : e.keyCode;
+
+    if (validateKeyPress(charCode) && keyNotExists(e.code)) {
+        for (var i = 0; i < kCont.length; i++) {
+            if (kCont[i].type == id) {
+                kCont[i].key = e.code;
+            }
+        }
+        saveTable('keyControl', kCont);
+        d(id + 'p').innerHTML = `<td>${id}</td><td id='${id}' onclick='editKeyTable(this)'>${e.code}</td>`;
+    } else {
+        renderKeys();
     }
+}
+const resetKeys = () => {
+    saveTable('keyControl', kConDefault);
+    kCont = copy(kConDefault);
+    renderKeys();
+}
+dae(d('key-reset'), 'click', resetKeys);
+
+
+const keyInit = () => {
+    kCont = loadTable(kConDefault, 'keyControl');
+    renderKeys();
+}
+// joystick controls
+
+const joyDefault = [{
+    type: 'forward',
+    command: 'Forward/Reverse',
+    key: 'a1',
+    sent: {
+        forwardO: false,
+        reverseO: false
+    }
+},
+{
+    type: 'right',
+    command: 'Left/Right',
+    key: 'a0',
+    sent: {
+        leftO: false,
+        rightO: false
+    }
+},
+{
+    type: 'stop',
+    command: 'Stop',
+    key: 'b2',
+    KEYDOWN: stop
+},
+{
+    type: 'light',
+    command: 'Headlight',
+    key: 'b0',
+    KEYDOWN: () => { keyBrightness('press'); }
+},
+{
+    type: 'brightnessp',
+    command: 'Headlight Brightness +',
+    key: 'b5',
+    KEYDOWN: () => { keyBrightness('plus'); }
+},
+{
+    type: 'brightnessm',
+    command: 'Headlight Brightness -',
+    key: 'b7',
+    KEYDOWN: () => { keyBrightness('minus'); }
+},
+{
+    type: 'speedp',
+    command: 'Speed +',
+    key: 'b4',
+    KEYDOWN: () => { keySpeed('plus'); }
+},
+{
+    type: 'speedm',
+    command: 'Speed -',
+    key: 'b6',
+    KEYDOWN: () => { keySpeed('minus'); }
+}]
+var joyCon;
+
+var gVector = [];
+
+const getGObj = (index) => {
+    var ele;
+
+    for (var i = 0; i < gVector.length; i++) {
+
+        if (gVector[i].index == index) {
+            ele = gVector[i];
+        }
+    }
+
+    return ele;
+}
+
+const joyEvents = (flag) => {
+    if (flag) {
+        if (state.joyStickConnected) {
+            update();
+        }
+    } else {
+        cancelAnimationFrame(joyUpdate);
+        clearProgress();
+    }
+}
+
+const renderJoy = () => {
+    const jc = d('joystick-controls');
+    let table = `<tr class="table-head"><th>Control</th><th>Channel</th></tr>`;
+    joyCon.forEach((item) => {
+        table += `<tr class="table-body" id="${item.type}j"><td>${item.command}</td><td id="${item.type}"><div class="progress" id="p${item.key}"><div><div></div></div></td></tr>`;
+    });
+    jc.innerHTML = table;
+}
+
+const clearProgress = () => {
+    joyCon.forEach((item) => {
+        d(`p${item.key}`).childNodes[0].childNodes[0].style.width = `0%`;
+    });
+}
+
+
+const clearSent = (item) => {
+    for (var i in item) {
+        item[i] = false;
+    }
+}
+const joyLogic = () => {
+    joyCon.forEach((item) => {
+        var obj = getGObj(item.key);
+        if(dc('settings').style.display == 'flex'){
+            d(`p${item.key}`).childNodes[0].childNodes[0].style.width = `${(obj.curr) * 100}%`;
+        }
+        try {
+            if (obj.type == 'axis') {
+                switch (item.command) {
+                    case 'Forward/Reverse':
+                        if (obj.curr > 0.7) {
+                            if (!item.sent.reverseO) {
+                               
+                                clearSent(item.sent);
+                                item.sent.reverseO = true;
+                                reverseO();
+                            }
+                        } else if (obj.curr < 0.3) {
+                            if (!item.sent.forwardO) {
+
+                                clearSent(item.sent);
+                                item.sent.forwardO = true;
+                              
+                                forwardO();
+                            }
+                        } else {
+                            if (item.sent.forwardO) {
+                                clearSent(item.sent);
+                               
+                                forwardF();
+
+                            } else if (item.sent.reverseO) {
+                                clearSent(item.sent);
+                              
+                                reverseF();
+                            }
+                        }
+                        break;
+                    case 'Left/Right':
+                        if (obj.curr > 0.7) {
+                            if (!item.sent.rightO) {
+                                clearSent(item.sent);
+                                item.sent.rightO = true;
+                                rightO();
+                            }
+                        } else if (obj.curr < 0.3) {
+                            if (!item.sent.leftO) {
+                                clearSent(item.sent);
+                                item.sent.leftO = true;
+                                leftO();
+                            }
+                        } else {
+                            if (item.sent.leftO) {
+                                clearSent(item.sent);
+                                leftF();
+                            } else if (item.sent.rightO) {
+                                clearSent(item.sent);
+                                rightF();
+                            }
+                        }
+                        break;
+                }
+            } else {
+                if (obj.curr - obj.prev == 1) {
+                    item.KEYDOWN();
+                }
+            }
+        } catch { }
+    });
+}
+var joyUpdate;
+const update = () => {
+    for (const gamepad of navigator.getGamepads()) {
+        var i = 0;
+        if (gamepad) {
+            for (const [index, axis] of gamepad.axes.entries()) {
+                gVector[i].prev = gVector[i].curr;
+                gVector[i].curr = axis * 0.5 + 0.5;
+                i++;
+            }
+            for (const [index, button] of gamepad.buttons.entries()) {
+                gVector[i].prev = gVector[i].curr;
+                gVector[i].curr = button.value;
+                i++;
+            }
+            joyLogic();
+            break;
+        }
+    }
+    joyUpdate = requestAnimationFrame(update);
+}
+const createGVector = () => {
+    gVector = [];
+    for (const gamepad of navigator.getGamepads()) {
+        if (gamepad) {
+            for (const [index, axis] of gamepad.axes.entries()) {
+                var gAxis = {
+                    type: 'axis',
+                    index: `a${index}`,
+                    prev: axis,
+                    curr: axis
+                };
+                gVector.push(gAxis);
+            }
+            for (const [index, button] of gamepad.buttons.entries()) {
+                var gButton = {
+                    type: 'button',
+                    index: `b${index}`,
+                    prev: button.value,
+                    curr: button.value
+                }
+                gVector.push(gButton);
+            }
+            break; //1 controller
+        }
+    }
+}
+
+const joyInit = () => {
+    joyCon = loadTable(joyDefault, 'joyControl');
+    renderJoy();
 }
 
 //IIFE
