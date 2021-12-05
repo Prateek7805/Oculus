@@ -4,7 +4,7 @@ The professional PCB version of my socketCar
 This project involves PCB design to build a car with the PCB as the Chassis, N20 micro gear motors, ESP8266 and a motor driver (DRV8833 in this case can use any alternatives).
 I have updated the socketCar design and added a pear of headlights which double down as status leds.
 
-<img src="https://raw.githubusercontent.com/Prateek7805/Oculus/main/2.JPG" max-width='350' height='auto'/>
+<img src="https://raw.githubusercontent.com/Prateek7805/Wireless_Remote_Controlled_Car_based_on_Websockets/main/2.JPG" max-width='350' height='auto'/>
  
 ### ESP12 to DRV833 (Motor Driver) connections: ###
 | ESP GPIO  | TB66FNG  |
