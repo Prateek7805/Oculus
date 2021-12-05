@@ -25,7 +25,7 @@ I have updated the socketCar design and added a pear of headlights which double 
 ### [ Working - part 2](https://www.instagram.com/p/CWd5ZtoFdUe/) ###
   
 ### Pinout ###
-<img src="https://raw.githubusercontent.com/Prateek7805/Oculus/main/pinout.JPG" max-width='250' height='auto'/>
+<img src="https://raw.githubusercontent.com/Prateek7805/Wireless_Remote_Controlled_Car_based_on_Websockets/main/pinout.JPG" max-width='250' height='auto'/>
 
 ### keyboard contols ###
 | key                | command                 |
