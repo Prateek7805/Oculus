@@ -6,7 +6,7 @@ I have updated the socketCar design and added a pear of headlights which double 
 
 <img src="https://raw.githubusercontent.com/Prateek7805/Wireless_Remote_Controlled_Car_based_on_Websockets/main/2.JPG" max-width='350' height='auto'/>
  
-### ESP12 to DRV833 (Motor Driver) connections: ###
+### ESP12 to DRV833 (Motor Driver) connections:
 | ESP GPIO  | TB66FNG  |
 |:---------:|:--------:|
 | 14        | IN1      |
@@ -15,19 +15,19 @@ I have updated the socketCar design and added a pear of headlights which double 
 | 5         | IN4      |
 
 
-### Other pin connections: ###
+### Other pin connections:
 | ESP GPIO  | PIN      |
 |:---------:|:--------:|
 | 15        | FLASH    |
 | 16        | RST      |
 
-### [ Working - part 1](https://www.instagram.com/p/CWa1VD3lScI/) ###
-### [ Working - part 2](https://www.instagram.com/p/CWd5ZtoFdUe/) ###
+### [ Working - part 1](https://www.instagram.com/p/CWa1VD3lScI/) 
+### [ Working - part 2](https://www.instagram.com/p/CWd5ZtoFdUe/) 
   
 ### Pinout ###
 <img src="https://raw.githubusercontent.com/Prateek7805/Wireless_Remote_Controlled_Car_based_on_Websockets/main/pinout.JPG" max-width='250' height='auto'/>
 
-### keyboard contols ###
+### keyboard contols
 | key                | command                 |
 |:------------------:|:-----------------------:|
 | Arrow UP           | Foraward                |
@@ -41,7 +41,7 @@ I have updated the socketCar design and added a pear of headlights which double 
 | H                  | headlights Brightness + |
 | N                  | headlights Brightness - |
 
-### Features ###
+### Features 
 * sidebar - control panel
 * Single page web interface
 * multi-touch
