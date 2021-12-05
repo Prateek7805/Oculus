@@ -1,4 +1,4 @@
-# Wireless Remote Controlled Car based on WebSockets - Socket Car#  
+# Wireless Remote Controlled Car based on WebSockets - Socket Car #  
 The professional PCB version of my socketCar
 
 This project involves PCB design to build a car with the PCB as the Chassis, N20 micro gear motors, ESP8266 and a motor driver (DRV8833 in this case can use any alternatives).
