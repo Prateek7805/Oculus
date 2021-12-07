@@ -56,36 +56,23 @@ settings
 <div class="nav-tiles push-down" id=setup>
 Credentials
 </div>
-<div class="nav-tiles push-down" id=reset-data>
-Reset Data
-</div>
 <div class="nav-tiles push-down" id=darkmode>
 Dark Mode
 </div>
 </div>
 <div class=gamepad>
 <div class=row-center>
-<button class="forward g-btn"><svg viewBox="0 0 24 24" fill=none stroke-linecap=round stroke-linejoin=round>
-<line x1=12 y1=19 x2=12 y2=5></line>
-<polyline points="5 12 12 5 19 12"></polyline>
-</svg></button>
+<button class="forward g-btn"></button>
 </div>
 <div class=row-center>
-<button class="left g-btn"><svg viewBox="0 0 24 24" fill=none stroke-linecap=round stroke-linejoin=round>
-<line x1=19 y1=12 x2=5 y2=12></line>
-<polyline points="12 19 5 12 12 5"></polyline>
-</svg></button><button class="stop g-btn"><svg viewBox="0 0 24 24" fill=none stroke-linecap=round stroke-linejoin=round>
+<button class="left g-btn"></button>
+<button class="stop g-btn"><svg viewBox="0 0 24 24" fill=none stroke-linecap=round stroke-linejoin=round>
 <circle cx=12 cy=12 r=10></circle>
-</svg></button><button class="right g-btn"><svg viewBox="0 0 24 24" fill=none stroke-linecap=round stroke-linejoin=round>
-<line x1=5 y1=12 x2=19 y2=12></line>
-<polyline points="12 5 19 12 12 19"></polyline>
 </svg></button>
+<button class="right g-btn"></button>
 </div>
 <div class=row-center>
-<button class="backward g-btn"><svg viewBox="0 0 24 24" fill=none oke-linecap=round stroke-linejoin=round>
-<line x1=12 y1=5 x2=12 y2=19></line>
-<polyline points="19 12 12 19 5 12"></polyline>
-</svg></button>
+<button class="backward g-btn"></button>
 </div>
 <div class="row-center my">
 <input type=range class="slider speed" max=255 min=0 value=0>
@@ -93,6 +80,10 @@ Dark Mode
 </div>
 </div>
 <div class="settings d-n">
+<div class=frow>
+<p class=s-title>Controls</p>
+</div>
+<div class=frow>
 <div>
 <div class=card>
 <div class=dfe>
@@ -138,37 +129,26 @@ Dark Mode
 </div>
 </div>
 </div>
-<div class=setup>
-<div>
+<div class=frow>
+<p class=s-title>Timed DeepSleep</p>
+</div>
+<div class=frow>
 <div class=card>
-<p class="text t-center">STA Credentials</p>
+<p class="text t-center">DeepSleep</p>
 <div class=dfe>
-<input class=card-textbox placeholder=SSID id=SSID_STA>
-</div>
-<div class=dfe>
-<input type=password class=card-textbox placeholder=password id=PASS_STA>
-</div>
-<div class=dfe>
-<button class=card-btn id=SUBMIT_STA>Submit</button>
-</div>
-</div>
-</div>
-<div>
-<div class=card>
-<p class="text t-center">AP Credentials</p>
-<div class=dfe>
-<input class=card-textbox placeholder=SSID id=SSID_AP>
+<input type=number class="card-number mx" min=0 max=9999 placeholder=HH oninput=validDs(this) id=dsHH>
+<input type=number class="card-number mx" min=0 max=59 placeholder=MM oninput=validDs(this) id=dsMM>
+<input type=number class="card-number mx" min=0 max=59 placeholder=SS oninput=validDs(this) id=dsSS>
 </div>
 <div class=dfe>
-<input type=password class=card-textbox placeholder=password id=PASS_AP>
-</div>
-<div class=dfe>
-<button class=card-btn id=SUBMIT_AP>Submit</button>
+<button class=card-btn id=timed-ds>DeepSleep</button>
 </div>
 </div>
 </div>
+<div class=frow>
+<p class=s-title>Reset Data</p>
 </div>
-<div class=reset-page>
+<div class=frow>
 <div>
 <div class=card>
 <div class=dfe>
@@ -196,6 +176,33 @@ Dark Mode
 </div>
 <div class=dfe>
 <button class=card-btn id=reset-all>Reset</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class=setup>
+<div>
+<div class=card>
+<p class="text t-center">STA Credentials</p>
+<div class=dfe>
+<input class=card-textbox placeholder=SSID id=SSID_STA>
+</div>
+<div class=dfc><input type=password class=card-textbox placeholder=password id=PASS_STA><div class=pass id=_PASS_STA></div></div>
+<div class=dfe>
+<button class=card-btn id=SUBMIT_STA>Submit</button>
+</div>
+</div>
+</div>
+<div>
+<div class=card>
+<p class="text t-center">AP Credentials</p>
+<div class=dfe>
+<input class=card-textbox placeholder=SSID id=SSID_AP>
+</div>
+<div class=dfc><input type=password class=card-textbox placeholder=password id=PASS_AP><div class=pass id=_PASS_AP></div></div>
+<div class=dfe>
+<button class=card-btn id=SUBMIT_AP>Submit</button>
 </div>
 </div>
 </div>

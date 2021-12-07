@@ -10,6 +10,7 @@
 	--dot-reconn: #FFCC29;
 	--progressOuter : #602080;
 	--progressInner: #7BC74D;
+	--headLight-glow: #0ff0ff;
 }
 .darkMode {
 	--background: #393E46;
@@ -22,7 +23,6 @@
 	--nav-tile-hover: #393E46;
 	--nav-border: #393E46;
 	--gamepad-button: #7BC74D;
-	--headLight-glow: #0ff0ff;
 	--slider-text : #EEEEEE;
 	--text: #EEEEEE;
 	--card: #2B2B2B;
@@ -41,7 +41,6 @@
 	--nav-tile-hover: #E2C275;
 	--nav-border: #E2C275;
 	--gamepad-button: #FBD148;
-	--headLight-glow: #0ff0ff;
 	--slider-text : #3F3351;
 	--text: #FBD148;
 	--card: #3F3351;
@@ -127,6 +126,10 @@ body{
 	display: flex;
 	justify-content: space-evenly;
 }
+.dfc{
+	display: flex;
+	justify-content: center;
+}
 .d-n{
 	display: none;
 }
@@ -146,7 +149,16 @@ body{
 .dot-reconn{
 	background-color: var(--dot-reconn);
 }
-
+.s-title{
+	text-align: center;
+	color: var(--text);
+	font-size: 1.5em;
+}
+.frow{
+	display: flex;
+	justify-content: space-around;
+	margin-bottom: 15px;
+}
 /* Table */
 
 .table-head{
@@ -233,6 +245,7 @@ body{
 	left: 0;
 	transform: translateX(-100%);
 	border : 1px solid var(--nav-border);
+	z-index: 5;
 }
 
 .nav-tiles {
@@ -431,11 +444,18 @@ body{
 
   /*setup page settings*/
 
-  .setup, .settings{
+  .setup{
 	  display: none;
 	  justify-content: space-around;
 	  padding: 2em;
 	  overflow-x: hidden;
+  }
+  .settings{
+	display: none;
+	justify-content: flex-start;
+	flex-direction: column;
+	padding: 2em;
+	overflow-x: hidden;
   }
   /* card */
   .card{
@@ -467,9 +487,22 @@ body{
    .card-textbox{
 	   border: none;
 	   border-radius: 4px;
-	   padding: 12px;
+	   padding: 12px 32px 12px 12px;
    }
-
+   .card-number{
+		border: none;
+		border-radius: 4px;
+		padding: 12px;
+	}
+   .eye{
+	   width: 25px;
+	   height: 25px;
+	   stroke: var(--card);
+	   margin-left: -26px;
+	   margin-top: 7px;
+	   padding: 0 2px;
+	   cursor: pointer;
+   }
    /* reset page */
    .reset-page{
 	   display: none;
@@ -511,7 +544,9 @@ body{
 	.nav-tiles {
 		font-size: var(--fontSizeSmall);
 	}
-
+	.frow{
+		flex-direction: column;
+	}
 	/* Slider */
 	.slider {
 		height: 0.7em;
@@ -528,7 +563,7 @@ body{
 	  }
 	
 	  /* setup */
-	  .setup, .settings{
+	  .setup{
 		  flex-direction: column;
 		  justify-content: flex-start;
 		  
@@ -541,6 +576,7 @@ body{
 	  .card > div{
 		  margin: 8px 0;
 	  }
+	  
 	  /* Reset page */
 	  .reset-page{
 		  flex-direction: column;

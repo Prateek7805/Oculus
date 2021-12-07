@@ -114,7 +114,6 @@ void loadCreds() {
   creds.ESP_SSID = file.readStringUntil('\n');
   creds.ESP_PASS = file.readStringUntil('\n');
   file.close();
-  Serial.printf("%s\n%s\n%s\n%s\n", creds.STA_SSID.c_str(), creds.STA_PASS.c_str(), creds.ESP_SSID.c_str(), creds.ESP_PASS.c_str());
   headLightUpdate();
 }
 
@@ -143,9 +142,9 @@ void updateCreds() {
 }
 
 bool validateCreds(String _ssid, String _pass) {
-  if (_ssid == "" || _ssid.length()<1 || _ssid.length()>32)
+  if (_ssid == "" || _ssid.length() < 1 || _ssid.length() > 32)
     return false;
-  if (_pass == "" || _pass.length()<8 || _pass.length()>63)
+  if (_pass == "" || _pass.length() < 8 || _pass.length() > 63)
     return false;
   return true;
 }
@@ -240,9 +239,7 @@ void setup() {
       String type = server.arg(0);
       String _SSID = server.arg(1);
       String _PASS = server.arg(2);
-      Serial.println(type);
-      Serial.println(_SSID);
-      Serial.println(_PASS);
+      
 
       if (validateCreds(_SSID, _PASS)) {
         if (type == "STA") {
@@ -333,9 +330,10 @@ void socketHandle(uint8_t num, WStype_t type, uint8_t * payload, size_t length) 
                     ESP.reset();
                   }
                 case 'd': {
+                    unsigned long t_deepSleep = (uint16_t) strtol((const char *)&payload[2], NULL, 10)*1e6;
                     updateState();
-                    notifyBlinkDelay();
-                    ESP.deepSleep(0);
+                    
+                    ESP.deepSleep(t_deepSleep);
                   }
               }
               break;

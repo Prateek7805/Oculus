@@ -4,6 +4,8 @@ const SPEED_MAX = 255;
 const SPEED_MIN = 0;
 const BRIGHT_MAX = 255;
 const BRIGHT_MIN = 0;
+const EYEOPEN = `<svg {{e}} viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`
+const EYECLOSE = `<svg {{e}} viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
 
 var Socket;
 var state = {
@@ -18,7 +20,7 @@ var controllerState = {
     keyboardS: false,
     joystickS: false
 };
-    
+
 //General Functions
 function d(i) {
     return document.getElementById(i);
@@ -31,6 +33,9 @@ function dar(o, e, f) {
 }
 function dc(c, i) {
     return document.getElementsByClassName(c)[i || 0];
+}
+function dca(c) {
+    return document.getElementsByClassName(c);
 }
 function dnone(o) {
     o.style.display = 'none';
@@ -152,24 +157,18 @@ const showGamepad = () => {
     var statusPage = dc('settings');
     var gamepad = dc('gamepad');
     var setup = dc('setup');
-    var resetPage = dc('reset-page');
     keyEvents(controllerState.keyboardS);
     joyEvents(controllerState.joystickS);
     dnone(statusPage);
     dnone(setup);
-    dnone(resetPage);
     dflex(gamepad);
 }
 
 const showSettings = () => {
-    var statusPage = dc('settings');
-    var gamepad = dc('gamepad');
-    var setup = dc('setup');
     dnone(dc('gamepad'));
     dnone(dc('setup'));
-    keyEvents(false);
-
     dflex(dc('settings'));
+    keyEvents(false);
 }
 
 const showSetup = () => {
@@ -180,13 +179,6 @@ const showSetup = () => {
     dflex(dc('setup'));
 }
 
-const showReset = () => {
-    keyEvents(false);
-
-    dnone(dc('gamepad'));
-    dnone(dc('settings'));
-    dflex(dc('reset-page'));
-}
 
 dae(dc('nav-hamburger'), 'click', () => {
     navBarSlide();
@@ -203,11 +195,6 @@ dae(dc('gamepad'), 'click', () => {
 dae(d('setup'), 'click', () => {
     closeNavBar();
     showSetup();
-});
-
-dae(d('reset-data'), 'click', () => {
-    closeNavBar();
-    showReset();
 });
 
 dae(d('setting'), 'click', () => {
@@ -257,6 +244,15 @@ dae(d('SUBMIT_AP'), 'click', () => {
     }
 });
 
+const showPass = (self, id) => {
+    let di = d(id);
+    di.type = (di.type == "password") ? "text" : "password";
+    let eyeC = EYECLOSE.replace('{{e}}', `onclick="showPass(this,'${id}')"`);
+    let eyeO = EYEOPEN.replace('{{e}}', `onclick="showPass(this,'${id}')"`);
+    let eyeRep = (di.type == "text") ? eyeO : eyeC;
+    self.parentElement.innerHTML = eyeRep;
+}
+
 const updateState = (data) => {
     state = {
         ...state,
@@ -295,12 +291,12 @@ const updateAllHeights = () => {
     setHeight(dc('gamepad'), contentHeight);
     setHeight(dc('settings'), contentHeight);
     setHeight(dc('setup'), contentHeight);
-    setHeight(dc('reset-page'), contentHeight);
+
 }
 
 dae(window, 'resize', updateAllHeights);
 
-const headlightToggle = () => {
+const hlToggle = () => {
     state.headLight = 1 - state.headLight;
     headLight();
     sendCommand('s', 'h', state.headLight);
@@ -359,52 +355,89 @@ const toggleTheme = () => setTheme(getTheme() != 'darkMode' ? 'darkMode' : 'ligh
 dae(d('darkmode'), 'click', toggleTheme);
 
 
+const sendCommand = (uri, q1, q2) => {
+    _send(uri[0] + q1, q2);
+}
+
+const forwardO = () => sendCommand('c', 0, 1);
+const reverseO = () => sendCommand('c', 1, 1);
+const leftO = () => sendCommand('c', 2, 1);
+const rightO = () => sendCommand('c', 3, 1);
+
+const forwardF = () => sendCommand('c', 0, 0);
+const reverseF = () => sendCommand('c', 1, 0);
+const leftF = () => sendCommand('c', 2, 0);
+const rightF = () => sendCommand('c', 3, 0);
+
+const stop = () => sendCommand('o', 's', 0);
+
+btnEvents = [
+    {
+        t: 'forward',
+        o: forwardO,
+        f: forwardF
+    },
+    {
+        t: 'right',
+        o: rightO,
+        f: rightF
+    },
+    {
+        t: 'backward',
+        o: reverseO,
+        f: reverseF
+    },
+    {
+        t: 'left',
+        o: leftO,
+        f: leftF
+    }
+];
+const validDs = (self) =>{
+    self.value = self.value.replaceAll(/[+-.]/g, '');
+    if(self.placeholder == 'MM' || self.placeholder == 'SS'){
+        if(parseInt(self.value) > 59){
+            self.value = 59;
+        }
+    }
+}
+const getDSTime = () =>{
+    let h = d('dsHH');
+    let m = d('dsMM');
+    let s = d('dsSS');
+    let time = 0;
+    time = (h.value === "")? 0 : parseInt(h.value)*3600;
+    time += (m.value === "")? 0 : parseInt(m.value)*60;
+    time += (s.value === "")? 0 : parseInt(s.value);
+    time = (time === 0)? 1 : time;
+    h.value = "";
+    m.value = "";
+    s.value = "";
+    return time;
+}
+dae(d('timed-ds'), 'click', ()=>{
+    sendCommand('s','d',getDSTime());
+});
 dae(document, 'DOMContentLoaded', () => {
     // nav height
     updateAllHeights();
 
-    dae(dc('forward'), 'mousedown', forwardO);
+    btnEvents.forEach((i) => {
+        dae(dc(i.t), 'mousedown', i.o);
+        dae(dc(i.t), 'mouseup', i.f);
 
-    dae(dc('backward'), 'mousedown', reverseO);
-
-    dae(dc('left'), 'mousedown', leftO);
-
-    dae(dc('right'), 'mousedown', rightO);
-
-    dae(dc('forward'), 'mouseup', forwardF);
-
-    dae(dc('backward'), 'mouseup', reverseF);
-
-    dae(dc('left'), 'mouseup', leftF);
-
-    dae(dc('right'), 'mouseup', rightF);
+        dae(dc(i.t), 'touchStart', i.o);
+        dae(dc(i.t), 'touchend', i.f);
+    });
 
 
     dae(dc('speed'), 'keydown', (e) => { e.preventDefault(); });
-
-
-    dae(dc('forward'), 'touchstart', forwardO);
-
-    dae(dc('backward'), 'touchstart', reverseO);
-
-    dae(dc('left'), 'touchstart', leftO);
-
-    dae(dc('right'), 'touchstart', rightO);
-
-    dae(dc('forward'), 'touchend', forwardF);
-
-    dae(dc('backward'), 'touchend', reverseF);
-
-    dae(dc('left'), 'touchend', leftF);
-
-    dae(dc('right'), 'touchend', rightF);
-
     dae(dc('stop'), 'click', () => { stop(); fetch(`${HOST_URL}/off`); });
 
 
     keyInit();
     joyInit();
-    
+
     dae(window, "gamepadconnected", () => {
         er('gamepad connected');
         state.jConn = true;
@@ -428,7 +461,7 @@ dae(document, 'DOMContentLoaded', () => {
             updateState(data);
             //Event Listeners
 
-            dae(d('headlight'), 'click', headlightToggle);
+            dae(d('headlight'), 'click', hlToggle);
 
             dae(d('brightness'), 'change', (e) => {
                 changeBrightness(e.target.value);
@@ -444,21 +477,6 @@ dae(document, 'DOMContentLoaded', () => {
 
 });
 
-const sendCommand = (uri, q1, q2) => {
-    _send(uri[0] + q1, q2);
-}
-
-const forwardO = () => sendCommand('c', 0, 1);
-const reverseO = () => sendCommand('c', 1, 1);
-const leftO = () => sendCommand('c', 2, 1);
-const rightO = () => sendCommand('c', 3, 1);
-
-const forwardF = () => sendCommand('c', 0, 0);
-const reverseF = () => sendCommand('c', 1, 0);
-const leftF = () => sendCommand('c', 2, 0);
-const rightF = () => sendCommand('c', 3, 0);
-
-const stop = () => sendCommand('o', 's', 0);
 
 //table local storage
 //common fns
@@ -486,7 +504,7 @@ const handleController = (e) => {
         controllerState[item] = false;
         try {
             d(item).checked = false;
-        } catch(e) { }
+        } catch (e) { }
     }
     d(e.target.id).checked = checked;
     controllerState[e.target.id] = checked;
@@ -519,7 +537,7 @@ const keySpeed = (type) => {
 const keyBrightness = (type) => {
     switch (type) {
         case 'press':
-            headlightToggle();
+            hlToggle();
             break;
         case 'plus':
             if (state.brightness < BRIGHT_MAX) {
@@ -579,14 +597,14 @@ const editKeyTable = (self) => {
     self.parentElement.innerHTML = `<td>${getkeyObj(self.id).command}</td><td id="${self.id}"><input type='text' class='table-text' onkeydown="setKey(event, this.parentElement.id)" placeholder="press a key"></td>`;
     d(self.id).childNodes[0].focus();
 }
-function validateKeyPress(keycode) {
-    var valid = (keycode > 47 && keycode < 58) || // number keys
-        keycode == 32 || keycode == 13 ||// spacebar & return key(s) (if you want to allow carriage returns)
-        (keycode > 36 && keycode < 41) ||//arrow keys
-        (keycode > 64 && keycode < 91) || // letter keys
-        (keycode > 95 && keycode < 112) || // numpad keys
-        (keycode > 185 && keycode < 193) || // ;=,-./` (in order)
-        (keycode > 218 && keycode < 223); // [\]' (in order)
+function validateKeyPress(k) {
+    var valid = (k > 47 && k < 58) || // number keys
+        k == 32 || k == 13 ||// spacebar & return key(s) (if you want to allow carriage returns)
+        (k > 36 && k < 41) ||//arrow keys
+        (k > 64 && k < 91) || // letter keys
+        (k > 95 && k < 112) || // numpad keys
+        (k > 185 && k < 193) || // ;=,-./` (in order)
+        (k > 218 && k < 223); // [\]' (in order)
     return valid;
 }
 function keyNotExists(key) {
@@ -597,7 +615,7 @@ function keyNotExists(key) {
     return flag;
 }
 
-const setKey = (e, id) => { 
+const setKey = (e, id) => {
     e = e || window.event;
     e.preventDefault();
     var charCode = (e.charCode) ? e.charCode : e.keyCode;
@@ -734,7 +752,7 @@ const clearSent = (item) => {
 const joyLogic = () => {
     joyCon.forEach((item) => {
         var obj = getGObj(item.key);
-        if(dc('settings').style.display == 'flex'){
+        if (dc('settings').style.display == 'flex') {
             d(`p${item.key}`).childNodes[0].childNodes[0].style.width = `${(obj.curr) * 100}%`;
         }
         try {
@@ -743,7 +761,7 @@ const joyLogic = () => {
                     case 'Forward/Reverse':
                         if (obj.curr > 0.7) {
                             if (!item.sent.reverseO) {
-                               
+
                                 clearSent(item.sent);
                                 item.sent.reverseO = true;
                                 reverseO();
@@ -753,18 +771,18 @@ const joyLogic = () => {
 
                                 clearSent(item.sent);
                                 item.sent.forwardO = true;
-                              
+
                                 forwardO();
                             }
                         } else {
                             if (item.sent.forwardO) {
                                 clearSent(item.sent);
-                               
+
                                 forwardF();
 
                             } else if (item.sent.reverseO) {
                                 clearSent(item.sent);
-                              
+
                                 reverseF();
                             }
                         }
@@ -798,7 +816,7 @@ const joyLogic = () => {
                     item.KEYDOWN();
                 }
             }
-        } catch(e) { }
+        } catch (e) { }
     });
 }
 var joyUpdate;
@@ -854,9 +872,33 @@ const joyInit = () => {
     renderJoy();
 }
 
+
+
+
 //IIFE
 
 (function () {
     toggleTheme();
     toggleTheme();
+})();
+
+(function () {
+
+    var arrow = `<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"
+                stroke-linejoin="round">
+                <line x1="12" y1="19" x2="12" y2="5"></line>
+                <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>`;
+    var j = 0;
+    btnEvents.forEach((i) => {
+        dc(i.t).innerHTML = arrow;
+        dc(i.t).childNodes[0].style = `transform:rotate(${90 * (j++)}deg)`;
+    });
+
+    let pass = dca('pass');
+    for (var i = 0; i < pass.length; i++) {
+        let id = pass[i].id.substring(1);
+        pass[i].innerHTML += EYECLOSE.replace("{{e}}", `onclick="showPass(this,'${id}')"`);
+    }
+
 })();

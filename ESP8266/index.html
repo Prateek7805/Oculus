@@ -60,9 +60,7 @@
                 <div class="nav-tiles push-down" id="setup">
                     Credentials
                 </div>
-                <div class="nav-tiles push-down" id="reset-data">
-                    Reset Data
-                </div>
+                
                 <div class="nav-tiles push-down" id="darkmode">
                     Dark Mode
                 </div>
@@ -70,87 +68,133 @@
 
             <div class="gamepad">
                 <div class="row-center">
-                    <button class="forward g-btn"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"
-                            stroke-linejoin="round">
-                            <line x1="12" y1="19" x2="12" y2="5"></line>
-                            <polyline points="5 12 12 5 19 12"></polyline>
-                        </svg></button>
+                    <button class="forward g-btn"></button>
                 </div>
                 <div class="row-center">
-                    <button class="left g-btn"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"
-                            stroke-linejoin="round">
-                            <line x1="19" y1="12" x2="5" y2="12"></line>
-                            <polyline points="12 19 5 12 12 5"></polyline>
-                        </svg></button><button class="stop g-btn"><svg viewBox="0 0 24 24" fill="none"
+                    <button class="left g-btn"></button>
+                    <button class="stop g-btn"><svg viewBox="0 0 24 24" fill="none"
                             stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
-                        </svg></button><button class="right g-btn"><svg viewBox="0 0 24 24" fill="none"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
                         </svg></button>
+                    <button class="right g-btn"></button>
                 </div>
                 <div class="row-center">
-                    <button class="backward g-btn"><svg viewBox="0 0 24 24" fill="none" oke-linecap="round"
-                            stroke-linejoin="round">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <polyline points="19 12 12 19 5 12"></polyline>
-                        </svg></button>
+                    <button class="backward g-btn"></button>
                 </div>
 
                 <div class="row-center my">
                     <input type="range" class="slider speed" max="255" min="0" value="0" />
                     <p id="speed-val" class="slider-text">0</p>
                 </div>
+               
+                
             </div>
 
             <div class="settings d-n">
-                <div>
-                    <div class="card">
-                        <div class="dfe">
-                            <p class="text t-center">Keyboard Controls</p>
-                            <label class="switch">
-                                <input id="keyboardS" type="checkbox" onchange="handleController(event)">
-                                <span class="check"></span>
-                            </label>
-                        </div>
-                        <div class="dfe">
-                            <button class="card-btn" id="key-reset">Reset Defaults</button>
-                            <button class="card-btn" onclick="renderKeys();">Cancel</button>
-                        </div>
-
-                        <table class='table my' id="keyboard-controls">
-
-                        </table>
-                    </div>
+                <div class="frow">
+                    <p class="s-title">Controls</p>
+                    
                 </div>
-                <div>
-                    <div class="card">
-                        <div class="dfe">
-                            <p class="text t-center">Gamepad Controls</p>
-                            <label class="switch">
-                                <input id="joystickS" type="checkbox" onchange="handleController(event)">
-                                <span class="check"></span>
-                            </label>
+                <div class="frow">
+                    <div>
+                        <div class="card">
+                            <div class="dfe">
+                                <p class="text t-center">Keyboard Controls</p>
+                                <label class="switch">
+                                    <input id="keyboardS" type="checkbox" onchange="handleController(event)">
+                                    <span class="check"></span>
+                                </label>
+                            </div>
+                            <div class="dfe">
+                                <button class="card-btn" id="key-reset">Reset Defaults</button>
+                                <button class="card-btn" onclick="renderKeys();">Cancel</button>
+                            </div>
+    
+                            <table class='table my' id="keyboard-controls">
+    
+                            </table>
                         </div>
-                        <table class="table my" id="joystick-controls">
-                            <tr class="table-head">
-                                <th>Control</th>
-                                <th>Channel</th>
-                            </tr>
-                            <tr class="table-body">
-                                <td>axis</td>
-                                <td>
-                                    <div class="progress">
-                                        <div>
-                                            <div></div>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="dfe">
+                                <p class="text t-center">Gamepad Controls</p>
+                                <label class="switch">
+                                    <input id="joystickS" type="checkbox" onchange="handleController(event)">
+                                    <span class="check"></span>
+                                </label>
+                            </div>
+                            <table class="table my" id="joystick-controls">
+                                <tr class="table-head">
+                                    <th>Control</th>
+                                    <th>Channel</th>
+                                </tr>
+                                <tr class="table-body">
+                                    <td>axis</td>
+                                    <td>
+                                        <div class="progress">
+                                            <div>
+                                                <div></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
+                <div class="frow">
+                    <p class="s-title">Timed DeepSleep</p>
+                </div>
+                <div class="frow">
+                    <div class="card">
+                        <p class="text t-center">DeepSleep</p>
+                        <div class="dfe">
+                            <input type="number" class="card-number mx" min="0" max="9999" placeholder="HH" oninput ="validDs(this)" id="dsHH">
+                            <input type="number" class="card-number mx" min="0" max="59" placeholder="MM" oninput ="validDs(this)" id="dsMM">
+                            <input type="number" class="card-number mx" min="0" max="59" placeholder="SS" oninput ="validDs(this)" id="dsSS">
+                        </div>
+                        <div class="dfe">
+                            <button class="card-btn" id="timed-ds">DeepSleep</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="frow">
+                    <p class="s-title">Reset Data</p>
+                </div>
+                <div class="frow">
+                    <div>
+                        <div class="card">
+                            <div class="dfe">
+                                <p class="text">Reset State</p>
+                            </div>
+                            <div class="dfe">
+                                <button class="card-btn" id="reset-state">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="dfe">
+                                <p class="text">Reset Credentials</p>
+                            </div>
+                            <div class="dfe">
+                                <button class="card-btn" id="reset-creds">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="dfe">
+                                <p class="text">Factory Reset</p>
+                            </div>
+                            <div class="dfe">
+                                <button class="card-btn" id="reset-all">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
 
             <div class="setup">
@@ -160,9 +204,8 @@
                         <div class="dfe">
                             <input type="text" class="card-textbox" placeholder="SSID" id="SSID_STA">
                         </div>
-                        <div class="dfe">
-                            <input type="password" class="card-textbox" placeholder="password" id="PASS_STA">
-                        </div>
+                        <div class="dfc"><input type="password" class="card-textbox" placeholder="password" id="PASS_STA"><div class="pass" id="_PASS_STA"></div></div>
+                        
                         <div class="dfe">
                             <button class="card-btn" id="SUBMIT_STA">Submit</button>
                         </div>
@@ -175,48 +218,15 @@
                         <div class="dfe">
                             <input type="text" class="card-textbox" placeholder="SSID" id="SSID_AP">
                         </div>
-                        <div class="dfe">
-                            <input type="password" class="card-textbox" placeholder="password" id="PASS_AP">
-                        </div>
+                        <div class="dfc"><input type="password" class="card-textbox" placeholder="password" id="PASS_AP"><div class="pass" id="_PASS_AP"></div></div>
                         <div class="dfe">
                             <button class="card-btn" id="SUBMIT_AP">Submit</button>
                         </div>
+                        
                     </div>
                 </div>
             </div>
-
-            <div class="reset-page">
-                <div>
-                    <div class="card">
-                        <div class="dfe">
-                            <p class="text">Reset State</p>
-                        </div>
-                        <div class="dfe">
-                            <button class="card-btn" id="reset-state">Reset</button>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <div class="card">
-                        <div class="dfe">
-                            <p class="text">Reset Credentials</p>
-                        </div>
-                        <div class="dfe">
-                            <button class="card-btn" id="reset-creds">Reset</button>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <div class="card">
-                        <div class="dfe">
-                            <p class="text">Factory Reset</p>
-                        </div>
-                        <div class="dfe">
-                            <button class="card-btn" id="reset-all">Reset</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                
         </div>
     </div>
     <script src="script.js"></script>
